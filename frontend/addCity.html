@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Yeni Şehir Ekle</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+    input {
+      width: 200px;
+      padding: 5px;
+      margin-bottom: 15px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005fa3;
+    }
+  </style>
+</head>
+<body>
+  <h2>Yeni Şehir Ekle</h2>
+  
+  <label for="name">Şehir İsmi:</label>
+  <input type="text" id="name" placeholder="Şehir ismi gir">
+
+  <label for="latitude">Latitude:</label>
+  <input type="number" id="latitude" placeholder="Enlem (ör: 41.0082)" step="any">
+
+  <label for="longitude">Longitude:</label>
+  <input type="number" id="longitude" placeholder="Boylam (ör: 28.9784)" step="any">
+
+  <br>
+  <button onclick="createCity()">Create</button>
+
+  <p id="status"></p>
+
+  <script>
+    async function createCity() {
+      const name = document.getElementById("name").value;
+      const latitude = parseFloat(document.getElementById("latitude").value);
+      const longitude = parseFloat(document.getElementById("longitude").value);
+
+      const city = { name, latitude, longitude };
+
+      try {
+        const response = await fetch("http://localhost:8080/api/cities", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(city)
+        });
+
+        if (response.ok) {
+          document.getElementById("status").innerText = "✅ Şehir başarıyla eklendi!";
+          // 2 saniye sonra map.html'e yönlendir
+          setTimeout(() => {
+            window.location.href = "map.html";
+          }, 2000);
+        } else {
+          document.getElementById("status").innerText = "❌ Şehir eklenemedi!";
+        }
+      } catch (error) {
+        console.error("Hata:", error);
+        document.getElementById("status").innerText = "⚠️ Sunucuya bağlanırken hata oluştu.";
+      }
+    }
+  </script>
+</body>
+</html>
