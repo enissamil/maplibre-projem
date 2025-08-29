@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="favoriFoto.png">
+    <title>Şehir Haritası</title>
+    <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.7.0/dist/maplibre-gl.css' />
+    <script src='https://unpkg.com/maplibre-gl@5.7.0/dist/maplibre-gl.js'></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        html, body, #map { height: 100%; }
+        #topbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #0077cc;
+            color: white;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 20px;
+            z-index: 1;
+        }
+        #topbar a {
+            background: white;
+            color: #0077cc;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        #topbar a:hover {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div id="topbar">
+        <div><strong>Şehir Haritası</strong></div>
+        <a href="addCity.html" target="_blank">Etiket Ekle</a>
+    </div>
+    <div id="map"></div>
+
+    <script>
+        const map = new maplibregl.Map({
+            container: 'map',
+            //asagidaki style satirini kendi MapTiler apikey'iniz ile degistirin
+            style: 'https://api.maptiler.com/maps/satellite/style.json?key=VuAYstDz4tzTEPewnaXd',
+            center: [28.9784, 41.0082], // İstanbul başlangıç noktası
+            zoom: 5
+        });
+
+        async function loadCities() {
+            try {
+                const response = await fetch("http://localhost:8080/api/cities/allCities");
+                const cities = await response.json();
+
+                cities.forEach(city => {
+                    const marker = new maplibregl.Marker()
+                        .setLngLat([city.longitude, city.latitude])
+                        .addTo(map);
+
+                    // Popup ekle
+                    const popup = new maplibregl.Popup({ offset: 25 })
+                        .setHTML(`<strong>${city.name}</strong><br>Lat: ${city.latitude}, Lng: ${city.longitude}`);
+                    
+                    marker.setPopup(popup);
+                });
+            } catch (error) {
+                console.error("Şehirler alınamadı:", error);
+            }
+        }
+
+        loadCities();
+    </script>
+</body>
+</html>
