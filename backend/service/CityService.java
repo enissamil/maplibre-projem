@@ -26,6 +26,21 @@ public class CityService {
         return cityRepository.save(city);
     }
 
-    public Optional<City> getCityById(Integer id) {return cityRepository.findById(id);}
+    public Optional<City> getCityById(Long id) {return cityRepository.findById(id);}
+
+    public boolean deleteCityById(Long id) {
+        if(cityRepository.existsById(id)){
+            cityRepository.deleteById(id);
+            return true;
+        }
+        else return false;
+    }
+
+    public City updateCityName(Long id, String newName) {
+        return cityRepository.findById(id).map(city -> {
+            city.setName(newName);
+            return cityRepository.save(city);
+        }).orElseThrow(() -> new RuntimeException("City not found with id: " + id));
+    }
 
 }
